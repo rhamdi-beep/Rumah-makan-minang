@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selera Bundo - Simulator & Rumah Makan Nasi Padang Otentik</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        minang: {
+                            maroon: '#7F1D1D',
+                            darkmaroon: '#450A0A',
+                            gold: '#D97706',
+                            lightgold: '#FBBF24',
+                            leaf: '#15803D',
+                            lightleaf: '#22C55E',
+                            charcoal: '#18181B',
+                            cream: '#FFFBEB'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Minang Motif Background Patterns & Animations */
+        .bg-minang-pattern {
+            background-color: #450A0A;
+            background-image: radial-gradient(#D97706 0.75px, transparent 0.75px), radial-gradient(#D97706 0.75px, #450A0A 0.75px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            background-opacity: 0.15;
+        }
+
+        .leaf-texture {
+            background-color: #14532D;
+            background-image: repeating-linear-gradient(45deg, #166534 0, #166534 10px, #14532D 10px, #14532D 20px);
+        }
+
+        .ceramic-texture {
+            background: radial-gradient(circle, #ffffff 0%, #f3f4f6 100%);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.08);
+        }
+
+        .gold-glow {
+            box-shadow: 0 0 25px rgba(217, 119, 6, 0.35);
+        }
+
+        @keyframes steam {
+            0% { transform: translateY(0) scaleX(1); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-20px) scaleX(1.3); opacity: 0; }
+        }
+
+        .steam-effect::after {
+            content: '☁️';
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            font-size: 20px;
+            animation: steam 2.5s infinite ease-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #18181B;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #7F1D1D;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D97706;
+        }
+    </style>
+</head>
+<body class="bg-minang-charcoal text-gray-100 font-sans antialiased selection:bg-minang-gold selection:text-minang-darkmaroon">
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-minang-darkmaroon/95 backdrop-blur-md border-b border-minang-gold/30 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Brand Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-minang-gold to-yellow-300 flex items-center justify-center text-minang-darkmaroon text-2xl font-bold shadow-lg border-2 border-amber-200">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <div>
+                        <span class="font-serif text-2xl font-bold tracking-wider text-amber-100 block leading-none">SELERA BUNDO</span>
+                        <span class="text-xs text-minang-lightgold tracking-widest uppercase font-semibold">Rumah Makan Minang Otentik</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Nav Links -->
+                <div class="hidden md:flex items-center space-x-8 text-sm font-medium">
+                    <a href="#hero" class="text-amber-100 hover:text-minang-lightgold transition">Beranda</a>
+                    <a href="#menu" class="text-amber-100 hover:text-minang-lightgold transition">Katalog Lauk</a>
+                    <a href="#simulator" class="text-amber-100 hover:text-minang-lightgold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-plate-wheat text-minang-gold"></i> Piring Saya
+                    </a>
+                    <a href="#ensiklopedia" class="text-amber-100 hover:text-minang-lightgold transition">Ensiklopedia Minang</a>
+                </div>
+
+                <!-- Dining Style Badge & Floating Plate Counter -->
+                <div class="flex items-center space-x-4">
+                    <button id="nav-plate-btn" onclick="scrollToSimulator()" class="relative bg-gradient-to-r from-minang-gold to-amber-600 hover:from-amber-500 hover:to-amber-700 text-minang-darkmaroon font-bold px-4 py-2.5 rounded-full shadow-lg flex items-center space-x-2 transition transform active:scale-95">
+                        <i class="fa-solid fa-utensils text-lg"></i>
+                        <span class="hidden sm:inline">Piring Padang</span>
+                        <span id="cart-count-badge" class="bg-minang-maroon text-amber-200 text-xs font-black px-2.5 py-0.5 rounded-full border border-amber-300/50">0</span>
+                    </button>
+                    <!-- Mobile Hamburger -->
+                    <button onclick="toggleMobileMenu()" class="md:hidden text-amber-200 text-2xl focus:outline-none">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-minang-maroon border-b border-minang-gold/30 px-4 pt-2 pb-6 space-y-3">
+            <a href="#hero" onclick="toggleMobileMenu()" class="block text-amber-100 hover:text-minang-lightgold font-medium py-2">Beranda</a>
+            <a href="#menu" onclick="toggleMobileMenu()" class="block text-amber-100 hover:text-minang-lightgold font-medium py-2">Katalog Lauk</a>
+            <a href="#simulator" onclick="toggleMobileMenu()" class="block text-amber-100 hover:text-minang-lightgold font-medium py-2">Piring Saya</a>
+            <a href="#ensiklopedia" onclick="toggleMobileMenu()" class="block text-amber-100 hover:text-minang-lightgold font-medium py-2">Ensiklopedia Minang</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="relative bg-minang-pattern py-16 lg:py-24 overflow-hidden border-b border-minang-gold/20">
+        <!-- Rumah Gadang Roof Silhouette Overlay -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none flex justify-center items-center">
+            <svg class="w-full h-full text-minang-gold" viewBox="0 0 1000 400" fill="currentColor">
+                <path d="M500,50 L550,150 L750,120 L650,220 L950,200 L800,320 L1000,350 L0,350 L200,320 L50,200 L350,220 L250,120 L450,150 Z"/>
+            </svg>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left Content -->
+                <div class="lg:col-span-7 text-center lg:text-left space-y-6">
+                    <div class="inline-flex items-center space-x-2 bg-minang-gold/20 border border-minang-gold/40 rounded-full px-4 py-1.5 text-minang-lightgold text-sm font-semibold backdrop-blur-sm">
+                        <i class="fa-solid fa-pepper-hot text-red-500 animate-bounce"></i>
+                        <span>Cita Rasa Khas Payakumbuh & Bukittinggi</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-serif font-extrabold text-amber-100 leading-tight">
+                        Rasa Otentik Minang,<br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-minang-lightgold to-yellow-500">
+                            "Tambuah Ciek!"
+                        </span>
+                    </h1>
+
+                    <p class="text-gray-300 text-lg sm:text-xl max-w-2xl font-light leading-relaxed">
+                        Nikmati kelezatan warisan kuliner Minangkabau. Dari Rendang Daging kental berkuali hingga Ayam Pop gurih legendaris, rakit piring impianmu secara interaktif di sini!
+                    </p>
+
+                    <!-- Dining Mode Selector -->
+                    <div class="pt-4">
+                        <p class="text-xs font-bold uppercase tracking-widest text-amber-300/80 mb-3">Pilih Gaya Menyantap:</p>
+                        <div class="inline-flex p-1.5 bg-black/40 border border-minang-gold/40 rounded-2xl backdrop-blur-md">
+                            <button id="btn-mode-hidang" onclick="setDiningMode('hidang')" class="flex items-center space-x-2 px-5 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-minang-gold text-minang-darkmaroon shadow-md">
+                                <i class="fa-solid fa-table-cells"></i>
+                                <span>Gaya Hidang (Prasmanan Meja)</span>
+                            </button>
+                            <button id="btn-mode-bungkus" onclick="setDiningMode('bungkus')" class="flex items-center space-x-2 px-5 py-3 rounded-xl font-bold text-sm transition-all duration-300 text-amber-200 hover:text-white">
+                                <i class="fa-solid fa-leaf text-green-400"></i>
+                                <span>Nasi Bungkus Banana Leaf</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-4">
+                        <a href="#simulator" class="bg-gradient-to-r from-minang-maroon to-red-900 hover:from-red-800 hover:to-minang-maroon text-amber-100 border border-minang-gold/50 font-bold px-8 py-4 rounded-xl shadow-xl hover:shadow-red-900/40 transition transform hover:-translate-y-0.5 flex items-center space-x-3">
+                            <i class="fa-solid fa-fire text-minang-gold text-xl"></i>
+                            <span>Rakit Piring Padang</span>
+                        </a>
+                        <a href="#menu" class="bg-zinc-800/80 hover:bg-zinc-700 text-gray-200 border border-zinc-600 font-semibold px-6 py-4 rounded-xl transition flex items-center space-x-2">
+                            <span>Jelajah Menu</span>
+                            <i class="fa-solid fa-arrow-down text-sm"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Visual Hero Box -->
+                <div class="lg:col-span-5 relative flex justify-center">
+                    <div class="relative w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-minang-gold/30 via-minang-maroon/50 to-transparent p-4 shadow-2xl border border-minang-gold/30">
+                        <!-- Hero Rotating Food Card Showcase -->
+                        <div class="w-full h-full rounded-full overflow-hidden border-4 border-minang-gold shadow-2xl relative group cursor-pointer" onclick="scrollToSimulator()">
+                            <img id="hero-img" src="https://images.unsplash.com/photo-1626804475297-4160820cca34?auto=format&fit=crop&w=800&q=80" alt="Nasi Padang Otentik" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-6 text-center">
+                                <span class="bg-minang-gold text-minang-darkmaroon text-xs font-black px-3 py-1 rounded-full uppercase self-center mb-2">Juara Kuliner Dunia</span>
+                                <h3 class="text-amber-100 font-serif font-bold text-xl">Rendang Sapi Ranah Minang</h3>
+                                <p class="text-amber-200/80 text-xs mt-1">Gulai kental kaya rempah pilihan Bundo</p>
+                            </div>
+                        </div>
+
+                        <!-- Floating Badges -->
+                        <div class="absolute -top-4 -left-4 bg-minang-maroon/90 backdrop-blur-md border border-minang-gold/60 p-3 rounded-2xl shadow-xl flex items-center space-x-3 animate-pulse">
+                            <i class="fa-solid fa-pepper-hot text-red-500 text-2xl"></i>
+                            <div>
+                                <p class="text-xs text-amber-200 font-bold">Sambal Hijau</p>
+                                <p class="text-[10px] text-gray-300">Pedas Gurih Mudo</p>
+                            </div>
+                        </div>
+
+                        <div class="absolute -bottom-4 -right-2 bg-green-950/90 backdrop-blur-md border border-green-500/60 p-3 rounded-2xl shadow-xl flex items-center space-x-3">
+                            <i class="fa-solid fa-leaf text-green-400 text-2xl"></i>
+                            <div>
+                                <p class="text-xs text-green-200 font-bold">Daun Pisang Alami</p>
+                                <p class="text-[10px] text-gray-300">Aroma Khas Bungkus</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-minang-lightgold mb-2">Katalog Lauk Otentik</h2>
+            <p class="text-3xl sm:text-4xl font-serif font-bold text-amber-100">Pilihan Lauk Rumah Makan Minang</p>
+            <p class="text-gray-400 mt-2 text-sm">Setiap hidangan dimasak secara tradisional menggunakan santan kelapa murni dan rempah segar asli Sumatra Barat.</p>
+        </div>
+
+        <!-- Filter Buttons & Search -->
+        <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+            <!-- Category Tabs -->
+            <div class="flex flex-wrap justify-center gap-2" id="category-filters">
+                <button onclick="filterCategory('all')" class="cat-btn active bg-minang-gold text-minang-darkmaroon font-bold px-4 py-2 rounded-xl text-sm transition shadow">Semua Menu</button>
+                <button onclick="filterCategory('utama')" class="cat-btn bg-zinc-800 hover:bg-zinc-700 text-amber-100 font-medium px-4 py-2 rounded-xl text-sm transition">Lauk Utama</button>
+                <button onclick="filterCategory('seafood')" class="cat-btn bg-zinc-800 hover:bg-zinc-700 text-amber-100 font-medium px-4 py-2 rounded-xl text-sm transition">Seafood</button>
+                <button onclick="filterCategory('sayur')" class="cat-btn bg-zinc-800 hover:bg-zinc-700 text-amber-100 font-medium px-4 py-2 rounded-xl text-sm transition">Sayur & Pelengkap</button>
+                <button onclick="filterCategory('minuman')" class="cat-btn bg-zinc-800 hover:bg-zinc-700 text-amber-100 font-medium px-4 py-2 rounded-xl text-sm transition">Minuman Khas</button>
+            </div>
+
+            <!-- Quick Search Bar -->
+            <div class="relative w-full md:w-64">
+                <input type="text" id="menu-search" oninput="handleSearch()" placeholder="Cari lauk (misal: Rendang)..." class="w-full bg-zinc-900 border border-zinc-700 text-amber-100 text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:border-minang-gold">
+                <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-gray-500 text-sm"></i>
+            </div>
+        </div>
+
+        <!-- Menu Cards Grid -->
+        <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Dynamically populated via JS -->
+        </div>
+    </section>
+
+    <!-- Simulator Section -->
+    <section id="simulator" class="py-16 bg-zinc-950 border-t border-b border-minang-gold/20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-8">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-minang-lightgold">Interactive Plate Builder</span>
+                    <h2 class="text-3xl sm:text-4xl font-serif font-bold text-amber-100 mt-1">Simulator "Piring Padang Saya"</h2>
+                    <p class="text-gray-400 text-sm mt-1">Atur kombinasi hidanganmu, lihat perkiraan kalori, dan cek indikator kepedasan!</p>
+                </div>
+                
+                <div class="mt-4 md:mt-0 flex items-center space-x-3">
+                    <span class="text-xs text-gray-400 font-medium">Wadah Menyantap:</span>
+                    <span id="current-mode-label" class="bg-minang-gold/20 border border-minang-gold text-minang-lightgold text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-check text-green-400"></i> Gaya Hidang (Piring Keramik)
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Left Plate Display Canvas -->
+                <div class="lg:col-span-7">
+                    <div id="plate-container" class="ceramic-texture rounded-3xl p-6 sm:p-10 border-4 border-amber-900/30 min-h-[420px] flex flex-col justify-between relative overflow-hidden transition-all duration-500 shadow-2xl">
+                        
+                        <!-- Top Header info inside plate -->
+                        <div class="flex justify-between items-center border-b border-gray-300/60 pb-3 z-10">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full bg-red-600 inline-block"></span>
+                                <span class="font-serif font-bold text-gray-800 text-lg tracking-wide" id="plate-visual-title">Piring Prasmanan Minang</span>
+                            </div>
+                            <button onclick="clearPlate()" class="text-xs text-red-700 hover:text-red-900 font-bold bg-red-100 px-3 py-1 rounded-full transition">
+                                <i class="fa-solid fa-trash-can mr-1"></i> Kosongkan Piring
+                            </button>
+                        </div>
+
+                        <!-- Center Selected Food Visual Badges Grid -->
+                        <div id="selected-items-grid" class="py-8 grid grid-cols-2 sm:grid-cols-3 gap-4 z-10 min-h-[220px] items-center justify-center">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <!-- Bottom "Tambuah Ciek!" Quick Extra Rice Action -->
+                        <div class="z-10 bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-amber-200/80 flex flex-wrap items-center justify-between gap-3 shadow-md">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-800 text-xl font-bold">
+                                    🍚
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-sm">Porsi Nasi Putih: <span id="rice-portion-count" class="text-minang-maroon">1 Porsi</span></h4>
+                                    <p class="text-[11px] text-gray-500">Nasi hangat khas Padang padat & pulen</p>
+                                </div>
+                            </div>
+                            <button onclick="addRicePortion()" class="bg-gradient-to-r from-amber-500 to-minang-gold hover:from-amber-600 hover:to-amber-500 text-minang-darkmaroon font-extrabold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider shadow transition transform active:scale-95 flex items-center gap-1.5">
+                                <i class="fa-solid fa-plus-circle"></i>
+                                <span>Tambuah Ciek! (+Nasi)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Nutrition & Order Bill Panel -->
+                <div class="lg:col-span-5 space-y-6">
+                    
+                    <!-- Spice & Calorie Meters Card -->
+                    <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl space-y-5 shadow-xl">
+                        <h3 class="font-serif text-lg font-bold text-amber-100 border-b border-zinc-800 pb-2">
+                            <i class="fa-solid fa-gauge-high text-minang-gold mr-2"></i> Indikator & Nutrisi Piring
+                        </h3>
+
+                        <!-- Spice Combination Level Meter -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold mb-1.5">
+                                <span class="text-gray-300">Kombinasi Kepedasan:</span>
+                                <span id="spice-level-text" class="text-amber-400">Sedang (🔥 2/5)</span>
+                            </div>
+                            <div class="w-full bg-zinc-800 rounded-full h-3 overflow-hidden p-0.5 border border-zinc-700">
+                                <div id="spice-progress-bar" class="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-600 h-2 rounded-full transition-all duration-500" style="width: 40%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Calories Counter -->
+                        <div class="grid grid-cols-2 gap-4 pt-2">
+                            <div class="bg-zinc-800/60 p-3 rounded-xl border border-zinc-700/50 text-center">
+                                <span class="text-[11px] text-gray-400 uppercase font-bold block">Perkiraan Kalori</span>
+                                <span id="total-calories" class="text-xl font-black text-amber-300">210 <span class="text-xs font-normal text-gray-400">kcal</span></span>
+                            </div>
+                            <div class="bg-zinc-800/60 p-3 rounded-xl border border-zinc-700/50 text-center">
+                                <span class="text-[11px] text-gray-400 uppercase font-bold block">Total Items</span>
+                                <span id="total-items-count" class="text-xl font-black text-amber-300">1 Lauk</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bill Receipt Summary -->
+                    <div class="bg-zinc-900 border border-minang-gold/30 p-6 rounded-2xl shadow-xl space-y-4 relative">
+                        <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+                            <span class="font-serif font-bold text-amber-100 text-lg">Rincian Nota Sanak</span>
+                            <span class="text-xs text-amber-300/70">RM Selera Bundo</span>
+                        </div>
+
+                        <div id="bill-items-list" class="space-y-2.5 max-h-48 overflow-y-auto pr-1 text-sm">
+                            <!-- Items inserted dynamically -->
+                        </div>
+
+                        <div class="border-t border-zinc-800 pt-4 space-y-2">
+                            <div class="flex justify-between text-sm text-gray-400">
+                                <span>Subtotal</span>
+                                <span id="bill-subtotal" class="text-gray-200">Rp 5.000</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-400">
+                                <span>Pajak Resto (10%)</span>
+                                <span id="bill-tax" class="text-gray-200">Rp 500</span>
+                            </div>
+                            <div class="flex justify-between text-base font-bold text-amber-200 pt-2 border-t border-zinc-800">
+                                <span>Total Tagihan</span>
+                                <span id="bill-grand-total" class="text-xl font-black text-minang-lightgold">Rp 5.500</span>
+                            </div>
+                        </div>
+
+                        <button onclick="checkoutOrder()" class="w-full mt-4 bg-gradient-to-r from-minang-gold via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-minang-darkmaroon font-black py-3.5 rounded-xl shadow-lg uppercase tracking-wider text-sm transition transform active:scale-98 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-receipt"></i>
+                            <span>Pesan Sekarang (Saluang)</span>
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Encyclopedia Section -->
+    <section id="ensiklopedia" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-14">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-minang-lightgold mb-2">Edukasi & Kuliner Minang</h2>
+            <p class="text-3xl sm:text-4xl font-serif font-bold text-amber-100">Bumbu Rahasia & Kamus Istilah</p>
+            <p class="text-gray-400 mt-2 text-sm">Pelajari rahasia rempah-rempah yang menciptakan kelezatan abadi dan pahami istilah populer di Rumah Makan Padang.</p>
+        </div>
+
+        <!-- Spices Grid -->
+        <h3 class="text-xl font-serif font-bold text-amber-200 mb-6 flex items-center gap-2">
+            <i class="fa-solid fa-seedling text-green-500"></i> Enam Bumbu Utama Dapur Minang
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+            
+            <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl hover:border-minang-gold/50 transition duration-300">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl mb-4">🥥</div>
+                <h4 class="font-serif font-bold text-amber-100 text-lg">Santan Kelapa Tua</h4>
+                <p class="text-gray-400 text-xs mt-2 leading-relaxed">Penyumbang rasa gurih legendaris dan minyak alami. Dimasak lama hingga mengental (*kalio*) lalu menjadi minyak hitam khas Rendang.</p>
+            </div>
+
+            <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl hover:border-minang-gold/50 transition duration-300">
+                <div class="w-12 h-12 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center text-2xl mb-4">🌶️</div>
+                <h4 class="font-serif font-bold text-amber-100 text-lg">Lado Mudo & Cabe Keriting</h4>
+                <p class="text-gray-400 text-xs mt-2 leading-relaxed">Cabai hijau keriting muda memberikan rasa pedas segar beraroma khas tanpa rasa pahit, sangat identik untuk Sambal Lado Mudo.</p>
+            </div>
+
+            <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl hover:border-minang-gold/50 transition duration-300">
+                <div class="w-12 h-12 rounded-xl bg-yellow-500/20 text-yellow-400 flex items-center justify-center text-2xl mb-4">🍋</div>
+                <h4 class="font-serif font-bold text-amber-100 text-lg">Asam Kandis & Asam Gelugur</h4>
+                <p class="text-gray-400 text-xs mt-2 leading-relaxed">Buah kering pemberi rasa asam segar yang bersih pada Gulai Ikan Kakap tanpa merusak tekstur santan.</p>
+            </div>
+
+            <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl hover:border-minang-gold/50 transition duration-300">
+                <div class="w-12 h-12 rounded-xl bg-amber-700/20 text-amber-300 flex items-center justify-center text-2xl mb-4">🌿</div>
+                <h4 class="font-serif font-bold text-amber-100 text-lg">Daun Kunyit & Serai</h4>
+                <p class="text-gray-400 text-xs mt-2 leading-relaxed">Daun kunyit diikat dan dimasak bersama gulai untuk menghilangkan bau amis daging/ikan sekaligus memberikan aroma wangi khas.</p>
+            </div>
+
+            <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl hover:border-minang-gold/50 transition duration-300">
+                <div class="w-12 h-12 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center text-2xl mb-4">🥔</div>
+                <h4 class="font-serif font-bold text-amber-100 text-lg">Lengkuas & Kunyit Hidup</h4>
+                <p class="text-gray-400 text-xs mt-2 leading-relaxed">Rimpang segar diparut halus sebagai pengempuk alami serat daging sapi dan pewarna kuning emas otentik pada gulai.</p>
+            </div>
+
+            <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl hover:border-minang-gold/50 transition duration-300">
+                <div class="w-12 h-12 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center text-2xl mb-4">🍃</div>
+                <h4 class="font-serif font-bold text-amber-100 text-lg">Daun Jeruk Purut</h4>
+                <p class="text-gray-400 text-xs mt-2 leading-relaxed">Dibuang tulang daunnya lalu diiris tipis atau dimasukkan utuh untuk memberikan kejutan aroma sitrus yang memikat panca indera.</p>
+            </div>
+
+        </div>
+
+        <!-- Dictionary Accordion / Cards -->
+        <h3 class="text-xl font-serif font-bold text-amber-200 mb-6 flex items-center gap-2">
+            <i class="fa-solid fa-book-bookmark text-minang-gold"></i> Kamus Istilah Rumah Makan Minang
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <div class="bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl flex space-x-4 items-start">
+                <span class="bg-minang-maroon text-amber-300 font-black text-xs px-2.5 py-1 rounded-md uppercase">Hidang</span>
+                <div>
+                    <h5 class="font-bold text-amber-100 text-sm">Gaya Hidang (Prasmanan Meja)</h5>
+                    <p class="text-gray-400 text-xs mt-1">Tradisi unik menyajikan puluhan piring lauk sekaligus di meja tamu. Anda hanya membayar lauk yang disentuh/dimakan.</p>
+                </div>
+            </div>
+
+            <div class="bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl flex space-x-4 items-start">
+                <span class="bg-minang-maroon text-amber-300 font-black text-xs px-2.5 py-1 rounded-md uppercase">Tambuah</span>
+                <div>
+                    <h5 class="font-bold text-amber-100 text-sm">Tambuah Ciek!</h5>
+                    <p class="text-gray-400 text-xs mt-1">Ungkapan populer yang berarti "Tambah Satu Lagi!". Biasa diucapkan saat meminta tambahan porsi nasi hangat.</p>
+                </div>
+            </div>
+
+            <div class="bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl flex space-x-4 items-start">
+                <span class="bg-minang-maroon text-amber-300 font-black text-xs px-2.5 py-1 rounded-md uppercase">Batokok</span>
+                <div>
+                    <h5 class="font-bold text-amber-100 text-sm">Dendeng Batokok</h5>
+                    <p class="text-gray-400 text-xs mt-1">Kata "Batokok" berarti dipukul/ditokok. Daging sapi dipukul dengan batu ulekan agar pipih dan seratnya empuk meresap bumbu.</p>
+                </div>
+            </div>
+
+            <div class="bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl flex space-x-4 items-start">
+                <span class="bg-minang-maroon text-amber-300 font-black text-xs px-2.5 py-1 rounded-md uppercase">Pop</span>
+                <div>
+                    <h5 class="font-bold text-amber-100 text-sm">Ayam Pop</h5>
+                    <p class="text-gray-400 text-xs mt-1">Ayam kampung tanpa kulit yang direbus dalam air kelapa & bumbu halus lalu digoreng kilat dalam minyak panas. Tetap putih namun sangat gurih.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-minang-darkmaroon border-t border-minang-gold/30 pt-12 pb-8 text-gray-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-zinc-800">
+                <div class="space-y-3 md:col-span-2">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-minang-gold flex items-center justify-center text-minang-darkmaroon font-bold text-xl">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+                        <span class="font-serif text-2xl font-bold text-amber-100">SELERA BUNDO</span>
+                    </div>
+                    <p class="text-xs text-gray-300 leading-relaxed max-w-md">
+                        Melestarikan tradisi cita rasa Minangkabau otentik dengan bahan-bahan kualitas terbaik. Menyajikan kehangatan masakan ibu di setiap suapan.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-amber-200 font-bold text-sm mb-3">Jam Operasional</h4>
+                    <p class="text-xs text-gray-300">Buka Setiap Hari</p>
+                    <p class="text-xs text-amber-400 font-semibold mt-1">09.00 WIB - 22.00 WIB</p>
+                    <p class="text-[11px] text-gray-500 mt-2">Menerima Pesanan Nasi Kotak & Prasmanan Acara</p>
+                </div>
+
+                <div>
+                    <h4 class="text-amber-200 font-bold text-sm mb-3">Lokasi Utama</h4>
+                    <p class="text-xs text-gray-300">Jl. Raya Minangkabau No. 88</p>
+                    <p class="text-xs text-gray-400">Padang, Sumatra Barat</p>
+                    <div class="flex space-x-3 mt-3">
+                        <a href="#" class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-amber-300 hover:bg-minang-gold hover:text-minang-darkmaroon transition"><i class="fa-brands fa-instagram text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-amber-300 hover:bg-minang-gold hover:text-minang-darkmaroon transition"><i class="fa-brands fa-whatsapp text-xs"></i></a>
+                        <a href="#" class="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-amber-300 hover:bg-minang-gold hover:text-minang-darkmaroon transition"><i class="fa-solid fa-location-dot text-xs"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500">
+                <p>© 2026 RM Selera Bundo. Hak Cipta Dilindungi.</p>
+                <p class="mt-2 sm:mt-0">Dibuat dengan ❤️ & Santan Kental Minang</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Menu Detail Modal -->
+    <div id="item-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-zinc-900 border border-minang-gold/40 rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl relative transform transition-all">
+            <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/60 hover:bg-black text-amber-200 w-8 h-8 rounded-full flex items-center justify-center z-10">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="h-56 relative">
+                <img id="modal-img" src="" alt="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"></div>
+                <span id="modal-category-badge" class="absolute bottom-3 left-4 bg-minang-gold text-minang-darkmaroon text-[10px] font-black uppercase px-2.5 py-1 rounded-full">Lauk Utama</span>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 id="modal-title" class="font-serif text-2xl font-bold text-amber-100">Judul Menu</h3>
+                        <p id="modal-spice" class="text-xs text-orange-400 font-bold mt-0.5">Tingkat Pedas: 🔥🔥🔥</p>
+                    </div>
+                    <span id="modal-price" class="text-xl font-black text-minang-lightgold">Rp 0</span>
+                </div>
+                <p id="modal-desc" class="text-gray-300 text-xs leading-relaxed">Deskripsi kelezatan lauk...</p>
+                
+                <div class="bg-zinc-800/80 p-3 rounded-xl border border-zinc-700/60 text-xs space-y-1">
+                    <span class="font-bold text-amber-200 block">Kandungan Nutrisi Per Porsi:</span>
+                    <div class="flex justify-between text-gray-300">
+                        <span>Kalori: <strong id="modal-cal" class="text-amber-300">350 kcal</strong></span>
+                        <span>Otentisitas: <strong class="text-green-400">100% Minang Asli</strong></span>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex space-x-3">
+                    <button id="modal-add-btn" onclick="" class="w-full bg-gradient-to-r from-minang-gold to-amber-600 hover:from-amber-500 hover:to-amber-700 text-minang-darkmaroon font-bold py-3 rounded-xl shadow-lg transition">
+                        + Tambah ke Piring Padang
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt / Order Success Modal -->
+    <div id="receipt-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-zinc-900 border-2 border-minang-gold rounded-3xl max-w-md w-full p-6 text-center space-y-5 shadow-2xl relative">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-green-500 to-emerald-300 text-minang-darkmaroon text-3xl font-bold flex items-center justify-center mx-auto shadow-lg animate-bounce">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            
+            <div>
+                <span class="text-xs font-bold text-minang-lightgold uppercase tracking-widest">Saluang & Tarima Kasih!</span>
+                <h3 class="font-serif text-2xl font-bold text-amber-100 mt-1">Pesanan Nasi Padang Diterima</h3>
+                <p class="text-gray-400 text-xs mt-1">Hidangan siap disajikan dengan kehangatan cinta Bundo.</p>
+            </div>
+
+            <div class="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 text-left text-xs space-y-2">
+                <div class="flex justify-between border-b border-zinc-800 pb-2">
+                    <span class="text-gray-400">Mode Menyantap:</span>
+                    <span id="receipt-mode" class="font-bold text-amber-200">Gaya Hidang</span>
+                </div>
+                <div class="flex justify-between border-b border-zinc-800 pb-2">
+                    <span class="text-gray-400">Estimasi Kepedasan:</span>
+                    <span id="receipt-spice" class="font-bold text-orange-400">Sedang</span>
+                </div>
+                <div class="flex justify-between text-sm font-bold text-amber-100 pt-1">
+                    <span>Total Dibayar:</span>
+                    <span id="receipt-total" class="text-minang-lightgold">Rp 0</span>
+                </div>
+            </div>
+
+            <button onclick="closeReceiptModal()" class="w-full bg-minang-gold hover:bg-amber-500 text-minang-darkmaroon font-black py-3 rounded-xl transition uppercase text-xs tracking-wider">
+                Selesai & Tambuah Lagi
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <script>
+        // Menu Items Database
+        const menuItems = [
+            {
+                id: 'rendang',
+                name: 'Rendang Sapi Sutan',
+                category: 'utama',
+                price: 28000,
+                calories: 380,
+                spiceLevel: 3,
+                image: 'https://images.unsplash.com/photo-1626804475297-4160820cca34?auto=format&fit=crop&w=600&q=80',
+                desc: 'Daging sapi pilihan dimasak 8 jam dengan santan kental dan 16 rempah utuh Minang hingga menghitam sempurna.',
+                tag: 'Juara CNN'
+            },
+            {
+                id: 'ayam-pop',
+                name: 'Ayam Pop Gurih Asli',
+                category: 'utama',
+                price: 24000,
+                calories: 290,
+                spiceLevel: 1,
+                image: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=600&q=80',
+                desc: 'Ayam kampung tanpa kulit direbus air kelapa & rempah halus, digoreng kilat. Disajikan dengan sambal timut manis gurih.',
+                tag: 'Favorit'
+            },
+            {
+                id: 'dendeng-batokok',
+                name: 'Dendeng Balado Batokok',
+                category: 'utama',
+                price: 26000,
+                calories: 310,
+                spiceLevel: 4,
+                image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
+                desc: 'Irisan daging sapi tipis dipukul lembut (batokok), dipanggang lalu disiram sambal cabai merah ulek kasar.',
+                tag: 'Pedas Mantap'
+            },
+            {
+                id: 'gulai-kakap',
+                name: 'Gulai Kepala Ikan Kakap',
+                category: 'seafood',
+                price: 45000,
+                calories: 420,
+                spiceLevel: 3,
+                image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=600&q=80',
+                desc: 'Kepala ikan kakap segar disiram kuah gulai kuning pekat beraroma kunyit, daun mangkokan, & asam kandis.',
+                tag: 'Spesial'
+            },
+            {
+                id: 'gulai-cumi',
+                name: 'Gulai Cumi Isi Telur',
+                category: 'seafood',
+                price: 32000,
+                calories: 340,
+                spiceLevel: 2,
+                image: 'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&w=600&q=80',
+                desc: 'Cumi segar berisi olahan telur dan tahu giling, dimasak dalam kuah gulai santan kemerahan gurih.',
+                tag: 'Gurih'
+            },
+            {
+                id: 'gulai-singkong',
+                name: 'Gulai Daun Singkong & Teri',
+                category: 'sayur',
+                price: 10000,
+                calories: 140,
+                spiceLevel: 2,
+                image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80',
+                desc: 'Pucuk daun singkong muda empuk direbus dan dimasak dalam kuah santan gurih bertabur renyahnya ikan teri.',
+                tag: 'Pelengkap Wajib'
+            },
+            {
+                id: 'telur-dadar',
+                name: 'Telur Dadar Padang Tebal',
+                category: 'sayur',
+                price: 12000,
+                calories: 220,
+                spiceLevel: 2,
+                image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=600&q=80',
+                desc: 'Dadar telur bebek tebal renyah khas Minang, kaya akan campuran kelapa sangrai, daun bawang, dan bumbu halus.',
+                tag: 'Renyah Tebal'
+            },
+            {
+                id: 'sambal-hijau',
+                name: 'Sambal Lado Mudo',
+                category: 'sayur',
+                price: 6000,
+                calories: 80,
+                spiceLevel: 3,
+                image: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=600&q=80',
+                desc: 'Cabai hijau keriting muda, ikan teri, dan tomat hijau ditumis lembut dengan minyak kelapa murni.',
+                tag: 'Iconic'
+            },
+            {
+                id: 'teh-talua',
+                name: 'Teh Talua Ranah Minang',
+                category: 'minuman',
+                price: 15000,
+                calories: 180,
+                spiceLevel: 0,
+                image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80',
+                desc: 'Minuman peningkat stamina khas Minang dari kocokan kuning telur bebek, teh hitam pekat, & perasan jeruk nipis.',
+                tag: 'Minuman Khas'
+            },
+            {
+                id: 'es-pengantin',
+                name: 'Es Air Mata Pengantin',
+                category: 'minuman',
+                price: 14000,
+                calories: 120,
+                spiceLevel: 0,
+                image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80',
+                desc: 'Minuman penutup segar tiga warna dengan irisan agar-agar kenyal, biji selasih, dan sirup rasa buah manis.',
+                tag: 'Segar'
+            }
+        ];
+
+        // App State
+        let diningMode = 'hidang'; // 'hidang' or 'bungkus'
+        let ricePortions = 1;
+        let selectedPlateItems = [
+            // Default initial item
+            { ...menuItems[0] }
+        ];
+
+        window.onload = function() {
+            renderMenuGrid(menuItems);
+            updatePlateUI();
+        };
+
+        function renderMenuGrid(items) {
+            const grid = document.getElementById('menu-grid');
+            grid.innerHTML = '';
+
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-400">
+                        <i class="fa-solid fa-utensils text-4xl mb-3 text-zinc-600"></i>
+                        <p class="font-semibold">Lauk tidak ditemukan, Sanak.</p>
+                        <p class="text-xs text-gray-500 mt-1">Coba gunakan kata kunci pencarian lain.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            items.forEach(item => {
+                const spiceFlames = '🔥'.repeat(item.spiceLevel) || '🟢 Mild';
+                const card = document.createElement('div');
+                card.className = 'bg-zinc-900 border border-zinc-800 hover:border-minang-gold/60 rounded-2xl overflow-hidden shadow-lg transition duration-300 flex flex-col justify-between group';
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="h-44 relative overflow-hidden cursor-pointer" onclick="openModal('${item.id}')">
+                            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 left-3 bg-minang-darkmaroon/90 text-minang-lightgold border border-minang-gold/40 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full backdrop-blur-sm">
+                                ${item.tag}
+                            </span>
+                            <span class="absolute bottom-2 right-2 bg-black/70 text-orange-400 text-[11px] font-bold px-2 py-0.5 rounded-md backdrop-blur-sm">
+                                ${spiceFlames}
+                            </span>
+                        </div>
+                        <div class="p-4 space-y-2">
+                            <div class="flex justify-between items-start gap-2">
+                                <h3 class="font-serif font-bold text-amber-100 text-base group-hover:text-minang-lightgold transition cursor-pointer" onclick="openModal('${item.id}')">
+                                    ${item.name}
+                                </h3>
+                            </div>
+                            <p class="text-gray-400 text-xs line-clamp-2 leading-relaxed">${item.desc}</p>
+                        </div>
+                    </div>
+                    <div class="p-4 pt-0 flex items-center justify-between mt-3 border-t border-zinc-800/80">
+                        <div>
+                            <span class="text-[10px] text-gray-500 uppercase font-semibold block">Harga</span>
+                            <span class="text-minang-lightgold font-black text-sm">Rp ${item.price.toLocaleString('id-ID')}</span>
+                        </div>
+                        <button onclick="addToPlate('${item.id}')" class="bg-gradient-to-r from-minang-maroon to-red-900 hover:from-red-800 hover:to-minang-maroon text-amber-200 border border-minang-gold/40 text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 transform active:scale-95">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Tambah</span>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterCategory(category) {
+            // Update button styles
+            const buttons = document.querySelectorAll('#category-filters button');
+            buttons.forEach(btn => {
+                btn.className = 'cat-btn bg-zinc-800 hover:bg-zinc-700 text-amber-100 font-medium px-4 py-2 rounded-xl text-sm transition';
+            });
+            event.target.className = 'cat-btn active bg-minang-gold text-minang-darkmaroon font-bold px-4 py-2 rounded-xl text-sm transition shadow';
+
+            if (category === 'all') {
+                renderMenuGrid(menuItems);
+            } else {
+                const filtered = menuItems.filter(item => item.category === category);
+                renderMenuGrid(filtered);
+            }
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('menu-search').value.toLowerCase();
+            const filtered = menuItems.filter(item => 
+                item.name.toLowerCase().includes(query) || 
+                item.desc.toLowerCase().includes(query)
+            );
+            renderMenuGrid(filtered);
+        }
+
+        function setDiningMode(mode) {
+            diningMode = mode;
+            const btnHidang = document.getElementById('btn-mode-hidang');
+            const btnBungkus = document.getElementById('btn-mode-bungkus');
+            const plateContainer = document.getElementById('plate-container');
+            const visualTitle = document.getElementById('plate-visual-title');
+            const modeLabel = document.getElementById('current-mode-label');
+
+            if (mode === 'hidang') {
+                btnHidang.className = 'flex items-center space-x-2 px-5 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-minang-gold text-minang-darkmaroon shadow-md';
+                btnBungkus.className = 'flex items-center space-x-2 px-5 py-3 rounded-xl font-bold text-sm transition-all duration-300 text-amber-200 hover:text-white';
+                
+                plateContainer.className = 'ceramic-texture rounded-3xl p-6 sm:p-10 border-4 border-amber-900/30 min-h-[420px] flex flex-col justify-between relative overflow-hidden transition-all duration-500 shadow-2xl';
+                visualTitle.textContent = 'Piring Prasmanan Minang';
+                visualTitle.className = 'font-serif font-bold text-gray-800 text-lg tracking-wide';
+                modeLabel.innerHTML = '<i class="fa-solid fa-circle-check text-green-400"></i> Gaya Hidang (Piring Keramik)';
+            } else {
+                btnBungkus.className = 'flex items-center space-x-2 px-5 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-minang-lightleaf text-green-950 shadow-md font-extrabold';
+                btnHidang.className = 'flex items-center space-x-2 px-5 py-3 rounded-xl font-bold text-sm transition-all duration-300 text-amber-200 hover:text-white';
+
+                plateContainer.className = 'leaf-texture rounded-3xl p-6 sm:p-10 border-4 border-green-800 min-h-[420px] flex flex-col justify-between relative overflow-hidden transition-all duration-500 shadow-2xl';
+                visualTitle.textContent = 'Nasi Bungkus Banana Leaf';
+                visualTitle.className = 'font-serif font-bold text-green-100 text-lg tracking-wide';
+                modeLabel.innerHTML = '<i class="fa-solid fa-leaf text-green-400"></i> Nasi Bungkus Banana Leaf';
+            }
+
+            showToast(`Gaya menyantap diubah ke: ${mode === 'hidang' ? 'Gaya Hidang' : 'Nasi Bungkus Banana Leaf'}`);
+        }
+
+        function addToPlate(itemId) {
+            const item = menuItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            selectedPlateItems.push({ ...item });
+            updatePlateUI();
+            showToast(`+ ${item.name} ditambahkan ke Piring!`);
+        }
+
+        function removeFromPlate(index) {
+            const removed = selectedPlateItems.splice(index, 1);
+            updatePlateUI();
+            if (removed.length > 0) {
+                showToast(`- ${removed[0].name} dihapus dari Piring.`);
+            }
+        }
+
+        function addRicePortion() {
+            ricePortions++;
+            updatePlateUI();
+            showToast(` Tambuah Ciek! Porsi nasi bertambah menjadi ${ricePortions}`);
+        }
+
+        function clearPlate() {
+            selectedPlateItems = [];
+            ricePortions = 1;
+            updatePlateUI();
+            showToast('Piring telah dikosongkan.');
+        }
+
+        function updatePlateUI() {
+            // Update Cart Badge Count
+            const totalCount = selectedPlateItems.length + ricePortions;
+            document.getElementById('cart-count-badge').textContent = totalCount;
+            document.getElementById('total-items-count').textContent = `${selectedPlateItems.length} Lauk + ${ricePortions} Nasi`;
+            document.getElementById('rice-portion-count').textContent = `${ricePortions} Porsi`;
+
+            // Update Selected Items Visual Grid inside Plate
+            const itemsGrid = document.getElementById('selected-items-grid');
+            itemsGrid.innerHTML = '';
+
+            // Base Rice Visual
+            const riceCard = document.createElement('div');
+            riceCard.className = 'bg-white/90 backdrop-blur-sm p-3 rounded-2xl border border-amber-300 shadow flex flex-col items-center text-center relative group';
+            riceCard.innerHTML = `
+                <span class="text-3xl mb-1">🍚</span>
+                <span class="font-serif font-bold text-gray-800 text-xs">Nasi Putih Warm</span>
+                <span class="text-[10px] text-amber-800 font-bold mt-0.5">${ricePortions}x Portion (Rp ${(ricePortions * 5000).toLocaleString('id-ID')})</span>
+            `;
+            itemsGrid.appendChild(riceCard);
+
+            // Item Cards
+            selectedPlateItems.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white/90 backdrop-blur-sm p-3 rounded-2xl border border-amber-200 shadow flex flex-col items-center text-center relative group animate-fade-in';
+                card.innerHTML = `
+                    <button onclick="removeFromPlate(${index})" class="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow opacity-90 group-hover:opacity-100 transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <img src="${item.image}" alt="${item.name}" class="w-12 h-12 rounded-full object-cover border-2 border-amber-400 mb-1">
+                    <span class="font-serif font-bold text-gray-900 text-xs line-clamp-1">${item.name}</span>
+                    <span class="text-[10px] text-minang-maroon font-bold">Rp ${item.price.toLocaleString('id-ID')}</span>
+                `;
+                itemsGrid.appendChild(card);
+            });
+
+            // Calculate Metrics
+            const baseRiceCal = ricePortions * 210;
+            const baseRicePrice = ricePortions * 5000;
+
+            const itemsCal = selectedPlateItems.reduce((sum, i) => sum + i.calories, 0);
+            const itemsPrice = selectedPlateItems.reduce((sum, i) => sum + i.price, 0);
+
+            const totalCal = baseRiceCal + itemsCal;
+            const subtotal = baseRicePrice + itemsPrice;
+            const tax = Math.round(subtotal * 0.1);
+            const grandTotal = subtotal + tax;
+
+            // Calculate Average Spice Level
+            let avgSpice = 1;
+            if (selectedPlateItems.length > 0) {
+                const sumSpice = selectedPlateItems.reduce((sum, i) => sum + i.spiceLevel, 0);
+                avgSpice = Math.round(sumSpice / selectedPlateItems.length);
+            }
+
+            // Update UI Elements
+            document.getElementById('total-calories').innerHTML = `${totalCal} <span class="text-xs font-normal text-gray-400">kcal</span>`;
+            document.getElementById('bill-subtotal').textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            document.getElementById('bill-tax').textContent = `Rp ${tax.toLocaleString('id-ID')}`;
+            document.getElementById('bill-grand-total').textContent = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+
+            // Update Spice Bar & Text
+            const spiceBar = document.getElementById('spice-progress-bar');
+            const spiceText = document.getElementById('spice-level-text');
+            const percentage = Math.min(100, Math.max(10, (avgSpice / 5) * 100));
+            spiceBar.style.width = `${percentage}%`;
+
+            if (avgSpice <= 1) {
+                spiceText.textContent = 'Guri / Lembut (🔥 1/5)';
+                spiceText.className = 'text-green-400 font-bold';
+            } else if (avgSpice <= 3) {
+                spiceText.textContent = 'Sedang Mantap (🔥🔥 3/5)';
+                spiceText.className = 'text-amber-400 font-bold';
+            } else {
+                spiceText.textContent = 'Sangat Pedas Minang! (🔥🔥🔥🔥 5/5)';
+                spiceText.className = 'text-red-500 font-bold animate-pulse';
+            }
+
+            // Render Itemized Bill List
+            const billList = document.getElementById('bill-items-list');
+            billList.innerHTML = `
+                <div class="flex justify-between text-gray-300">
+                    <span>Nasi Putih (${ricePortions}x)</span>
+                    <span class="font-semibold">Rp ${baseRicePrice.toLocaleString('id-ID')}</span>
+                </div>
+            `;
+
+            selectedPlateItems.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between text-gray-300';
+                row.innerHTML = `
+                    <span class="truncate max-w-[200px]">${item.name}</span>
+                    <span class="font-semibold">Rp ${item.price.toLocaleString('id-ID')}</span>
+                `;
+                billList.appendChild(row);
+            });
+        }
+
+        function openModal(itemId) {
+            const item = menuItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            document.getElementById('modal-img').src = item.image;
+            document.getElementById('modal-title').textContent = item.name;
+            document.getElementById('modal-price').textContent = `Rp ${item.price.toLocaleString('id-ID')}`;
+            document.getElementById('modal-desc').textContent = item.desc;
+            document.getElementById('modal-cal').textContent = `${item.calories} kcal`;
+            document.getElementById('modal-category-badge').textContent = item.category.toUpperCase();
+            document.getElementById('modal-spice').textContent = `Tingkat Pedas: ${'🔥'.repeat(item.spiceLevel) || '🟢 Mild'}`;
+
+            const addBtn = document.getElementById('modal-add-btn');
+            addBtn.onclick = function() {
+                addToPlate(item.id);
+                closeModal();
+            };
+
+            document.getElementById('item-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('item-modal').classList.add('hidden');
+        }
+
+        function checkoutOrder() {
+            const grandTotalText = document.getElementById('bill-grand-total').textContent;
+            const spiceText = document.getElementById('spice-level-text').textContent;
+
+            document.getElementById('receipt-mode').textContent = diningMode === 'hidang' ? 'Gaya Hidang (Prasmanan)' : 'Nasi Bungkus Banana Leaf';
+            document.getElementById('receipt-spice').textContent = spiceText;
+            document.getElementById('receipt-total').textContent = grandTotalText;
+
+            document.getElementById('receipt-modal').classList.remove('hidden');
+        }
+
+        function closeReceiptModal() {
+            document.getElementById('receipt-modal').classList.add('hidden');
+            clearPlate();
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-zinc-900 border-2 border-minang-gold text-amber-100 text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-2 transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto';
+            toast.innerHTML = `
+                <i class="fa-solid fa-circle-check text-minang-lightgold text-base"></i>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function scrollToSimulator() {
+            const sim = document.getElementById('simulator');
+            sim.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
